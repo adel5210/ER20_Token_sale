@@ -5,9 +5,9 @@ import "./Crowdsale.sol";
 
 contract MyTokenSale is Crowdsale {
     constructor(
-        uint256 rate,    // rate in TKNbits
+        uint256 rate,    // rate in WeiToken
         address payable wallet,
-        IERC20 token
+        IERC20 token     
     )
         Crowdsale(rate, wallet, token)
         public
