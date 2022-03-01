@@ -2,18 +2,11 @@ require("dotenv").config({
     path:"../.env"
 });
 
-const Token = artifacts.require("MyToken");
-
-// import from node_modules folder
-var chai = require("chai");
+const chai = require("./setupchai.js");
+const BN = web3.utils.BN;
 const expect = chai.expect;
 
-const BN = web3.utils.BN;
-const chaiBN = require('chai-bn')(BN);
-chai.use(chaiBN);
-
-var chaiAsPromised = require("chai-as-promised");
-chai.use(chaiAsPromised);
+const Token = artifacts.require("MyToken");
 
 contract("Token test", async (accounts) => {
 
@@ -28,7 +21,7 @@ contract("Token test", async (accounts) => {
         let instance = this.myToken;
         let totalSupply = await instance.totalSupply();
 
-        await expect(instance.balanceOf(initialHolder)).to.eventually.be.a.bignumber.equal(totalSupply);
+        return expect(instance.balanceOf(initialHolder)).to.eventually.be.a.bignumber.equal(totalSupply);
     });
 
     //Test2
@@ -46,7 +39,7 @@ contract("Token test", async (accounts) => {
         await expect(instance.balanceOf(initialHolder)).to.eventually.be.a.bignumber.equal(totalSupply.sub(new BN(sendTokens)));
         
         //Test if recipient amount increase
-        await expect(instance.balanceOf(recipient)).to.eventually.be.a.bignumber.equal(new BN(sendTokens));
+        return expect(instance.balanceOf(recipient)).to.eventually.be.a.bignumber.equal(new BN(sendTokens));
       });
   
 
@@ -59,7 +52,7 @@ contract("Token test", async (accounts) => {
         await expect(instance.transfer(recipient, new BN(balanceOfAccount+1))).to.eventually.be.rejected;
   
         //check if the balance is still the same after attempt sent
-        await expect(instance.balanceOf(initialHolder)).to.eventually.be.a.bignumber.equal(balanceOfAccount);
+        return expect(instance.balanceOf(initialHolder)).to.eventually.be.a.bignumber.equal(balanceOfAccount);
     });
 
 });
