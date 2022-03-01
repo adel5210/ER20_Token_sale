@@ -1,12 +1,12 @@
 const Token = artifacts.require("MyToken");
 
+// import from node_modules folder
 var chai = require("chai");
+const chaiBN = require("chai-bn")(BN);
+const chaiAsPromised = require("chai-as-promised");
 const BN = web3.utils.BN;
 
-const chaiBN = require("chai-bn")(BN);
 chai.use(chaiBN);
-
-var chaiAsPromised = require("chai-as-promised");
 chai.use(chaiAsPromised);
 
 const expect = chai.expect;
@@ -20,7 +20,7 @@ contract("Token test", async (accounts) => {
     });
 
     //Test1
-    it("All tokens should be in my account", async() => {
+    it("Initial supply to token", async() => {
         let instance = this.myToken;
         let totalSupply = await instance.totalSupply();
 
@@ -34,9 +34,14 @@ contract("Token test", async (accounts) => {
         let instance = this.myToken;
         let totalSupply = await instance.totalSupply();
 
+        //Test Token SC has initial balanace
         await expect(instance.balanceOf(initialHolder)).to.eventually.be.a.bignumber.equal(totalSupply);
+        
+        //Test Send 1 token to recipient
         await expect(instance.transfer(recipient, sendTokens)).to.eventually.be.fulfilled;      
         await expect(instance.balanceOf(initialHolder)).to.eventually.be.a.bignumber.equal(totalSupply.sub(new BN(sendTokens)));
+        
+        //Test if recipient amount increase
         await expect(instance.balanceOf(recipient)).to.eventually.be.a.bignumber.equal(new BN(sendTokens));
       });
   
@@ -45,9 +50,11 @@ contract("Token test", async (accounts) => {
     it("It's not possible to send more tokens than account 1 has", async () => {
         let instance = this.myToken;
         let balanceOfAccount = await instance.balanceOf(initialHolder);
+
+        //Test if initial deployer transfer with max limit token
         await expect(instance.transfer(recipient, new BN(balanceOfAccount+1))).to.eventually.be.rejected;
   
-        //check if the balance is still the same
+        //check if the balance is still the same after attempt sent
         await expect(instance.balanceOf(initialHolder)).to.eventually.be.a.bignumber.equal(balanceOfAccount);
     });
 
