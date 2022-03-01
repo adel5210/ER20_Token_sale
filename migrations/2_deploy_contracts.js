@@ -1,6 +1,7 @@
 //setup artifiacts
 var MyToken = artifacts.require("MyToken");
 var MyTokenSales = artifacts.require("MyTokenSale");
+var MyKycContract = artifacts.require("KycContract");
 
 //Configuration file from .env 
 //npm install --save dotenv
@@ -15,8 +16,10 @@ module.exports = async function(deployer) {
     // deploy MyTokenSales contract with constructor arguments
     await deployer.deploy(MyToken,       process.env.INITIAL_TOKENS);
     
+    await deployer.deploy(MyKycContract);
+
     // deploy MyTokenSales contract with constructor arguments 1 wei - token, token which gets money 
-    await deployer.deploy(MyTokenSales,      1, addr[0], MyToken.address);
+    await deployer.deploy(MyTokenSales,      1, addr[0], MyToken.address, MyKycContract.address);
 
     let tokenInstance = await MyToken.deployed();
 
